@@ -3,7 +3,9 @@
 #include <math.h>
 #define N 4
 
-void printArray(int arr[][4], int size) {
+
+//printing of array
+void printArray(int arr[][N], int size) {
 	int i,j;
 	for(i=0; i<size; i+=1) {
 		for(j=0; j<size; j+=1) {
@@ -14,7 +16,8 @@ void printArray(int arr[][4], int size) {
 	printf("\n\n");
 }
 
-int checkRow(int arr[][4], int row, int size, int num) {
+//checking the rows if the input good to use
+int checkRow(int arr[][N], int row, int size, int num) {
 	int col;
 	for(col=0; col<size; col+=1) {
 		if(arr[row][col] == num) {
@@ -24,7 +27,8 @@ int checkRow(int arr[][4], int row, int size, int num) {
 	return 1;
 }
 
-int checkCol(int arr[][4], int col, int size, int num) {
+//checking the col if the input is good to use
+int checkCol(int arr[][N], int col, int size, int num) {
 	int row;
 	for(row=0; row<size; row+=1) {
 		if(arr[row][col] == num) {
@@ -34,7 +38,8 @@ int checkCol(int arr[][4], int col, int size, int num) {
 	return 1;
 }
 
-int checkSubgrid(int arr[][4], int subgridRow, int subGridCol, int size, int num) {
+//checking the subgrid if the input is good to use
+int checkSubgrid(int arr[][N], int subgridRow, int subGridCol, int size, int num) {
 	int row, col;
 	for(row=0; row<sqrt(size); row+=1) {
 		for(col=0; col<sqrt(size); col+=1) {
@@ -46,7 +51,8 @@ int checkSubgrid(int arr[][4], int subgridRow, int subGridCol, int size, int num
 	return 1;
 }
 
-int isvalidInput(int arr[][4], int row, int col, int size, int num){
+//summarizes the different checkers for the input
+int isvalidInput(int arr[][N], int row, int col, int size, int num){
 	int size2 = (int) sqrt(size);
 	if(checkRow(arr,row,size,num) == 0)
 		return 0;
@@ -57,7 +63,8 @@ int isvalidInput(int arr[][4], int row, int col, int size, int num){
 	return 1;
 }
 
-int isValidSoln(int arr[][4], int size){
+//checks the finished sudoku solution if it good
+int isValidSoln(int arr[][N], int size){
 	int i,j;
 	int checkerRow[size];
 	int checkerCol[size];
@@ -68,6 +75,7 @@ int isValidSoln(int arr[][4], int size){
 		checkerCol[i]=0;
 	}
 
+	//checks for unfilled cells
 	for(i=0;i<size;i+=1){
 		for(j=0;j<size;j+=1){
 			if(arr[i][j] == 0)
@@ -78,11 +86,23 @@ int isValidSoln(int arr[][4], int size){
 	//check if there are no duplicates -> row
 	for(i=0;i<size;i+=1){
 		for(j=0;j<size;j+=1){
-			checkerRow[j] +=1;
+			checkerRow[arr[i][j]-1] +=1;
 		}
 
 		for(j=0;j<size;j+=1){
 			if(checkerRow[j] != i+1)
+				return 0;
+		}
+	}
+
+	//check if there re no duplicates -> col
+	for(i=0;i<size;i+=1){
+		for(j=0;j<size;j+=1){
+			checkerCol[arr[j][i]-1] +=1;
+		}
+
+		for(j=0;j<size;j+=1){
+			if(checkerCol[j] != i+1)
 				return 0;
 		}
 	}
@@ -97,7 +117,16 @@ int main(){
 	int inputOpts[numCells][numOpts];
 	int coords[numCells][2];
 	int tos[numCells];
-	int arr[N][N] = {1,0,0,3,2,0,4,0,0,2,0,0,0,0,0,0};
+	int arr[N][N] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	/*int arr[9][9] = 	{1,0,0,0,2,0,0,0,4,
+						0,2,0,0,0,8,0,1,0,
+						0,0,3,0,4,0,2,0,0,
+						0,0,0,4,0,3,0,0,0,
+						0,1,0,0,5,0,0,4,0,
+						0,0,0,7,6,9,0,0,0,
+						0,0,6,0,7,0,8,0,0,
+						0,9,0,0,8,0,0,7,0,
+						8,0,7,0,9,0,0,0,6};*/
 	int i,j;
 	int start, move,num;
 	int countValid = 0;
@@ -112,12 +141,16 @@ int main(){
 		coords[i][1] = -1;
 	}
 
+	for(i=0;i<numCells;i+=1){
+		for(j=0;j<numOpts;j+=1){
+			inputOpts[i][j] = -1;
+		}
+	}
+
 	//setting up the coords table
 	for(i=0;i<size;i+=1){
 		for(j=0;j<size;j+=1){
-			inputOpts[i][j] = -1;
 			if(arr[i][j] == 0){
-				//printf("here\n");
 				move += 1;
 				coords[move][0] = i;
 				coords[move][1] = j;
@@ -125,20 +158,23 @@ int main(){
 		}
 	}
 
+	printArray(arr,size);
+
 	move = 0;
 	while(tos[start]>0){
 		if(tos[move]>0){
+
 			if(inputOpts[move][tos[move]] != -1)
 				arr[coords[move][0]][coords[move][1]] = inputOpts[move][tos[move]];
-
-			//printArray(arr,size);
 
 			move +=1;
 			tos[move]=0;
 
-			if(isValidSoln(arr,size) == 1){
-				countValid+=1;
+			if(isValidSoln(arr,size) != 0){
+				countValid+=1;	
+				printf("Solution %d:\n",countValid);
 				printArray(arr,size);
+				//printf("%d\n",tos[start]);
 			}else{
 				//check of other possible answers
 				//populating the stack with only possible answers per cell (puzzle)
@@ -152,9 +188,11 @@ int main(){
 				}
 			}
 		}else{
+			//backtrack
 			move -= 1;
-			inputOpts[move][tos[move]] =-1;
+			inputOpts[move][tos[move]] = -1;
 			tos[move] -=1;
+			//printf("MOVE: %d\n", move);
 			if(move!=0)
 				arr[coords[move][0]][coords[move][1]] = 0;
 		}
