@@ -16,6 +16,11 @@ void printArray(int arr[][N], int size) {
 	printf("\n\n");
 }
 
+//check if there is no dublicate on the main diagonals of the puzzle
+// int sudokuX(int arr[][N], int row, int size, int num) {
+// 	int 
+// }
+
 //checking the rows if the input good to use
 int checkRow(int arr[][N], int row, int size, int num) {
 	int col;
@@ -60,6 +65,8 @@ int isvalidInput(int arr[][N], int row, int col, int size, int num){
 		return 0;
 	if(checkSubgrid(arr, row-row%(size2), col-col%(size2), size,num)==0)
 		return 0;
+	// if(checkSudokuX())
+	// 	return 0;
 	return 1;
 }
 
@@ -68,11 +75,15 @@ int isValidSoln(int arr[][N], int size){
 	int i,j;
 	int checkerRow[size];
 	int checkerCol[size];
+	int checkerDiag1[size];
+	int checkerDiag2[size];
 
 	//initialize checkerArray
 	for(i=0;i<size;i+=1){
 		checkerRow[i]=0;
 		checkerCol[i]=0;
+		checkerDiag1[i]=0;
+		checkerDiag2[i]=0;
 	}
 
 	//checks for unfilled cells
@@ -106,6 +117,35 @@ int isValidSoln(int arr[][N], int size){
 				return 0;
 		}
 	}
+
+	//check if there is no duplicates in the main diagonal 1
+	for(i=0;i<size;i+=1){
+		for(j=0;j<size;j+=1){
+			if(i==j){
+				checkerDiag1[arr[j][i]-1] +=1;
+			}
+
+			for(j=0;j<size;j+=1){
+				if(checkerDiag1[j] != i+1)
+					return 0;	
+			}
+		}
+	}
+
+	//check if there is no duplicates in the main diagonal 2
+	for(i=0;i<size;i+=1){
+		for(j=0;j<size;j+=1){
+			if((i+j)==size-1){
+				checkerDiag2[arr[j][i]-1] +=1;
+			}
+
+			for(j=0;j<size;j+=1){
+				if(checkerDiag2[j] != i+1)
+					return 0;
+			}
+		}
+	}
+
 
 	return 1;
 }
